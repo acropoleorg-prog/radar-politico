@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar Político · Acrópole</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:      #001529;
+  --navy-mid:  #0a2240;
+  --navy-card: #081d38;
+  --gold:      #C9A84C;
+  --gold-dim:  #7a6230;
+  --white:     #F0EAD8;
+  --muted:     #7a7060;
+  --border:    rgba(201,168,76,0.15);
+  --red:       #b03030;
+  --green:     #2d7a4a;
+  --blue:      #2a5fa0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: 'EB Garamond', Georgia, serif;
+  min-height: 100vh;
+}
+
+/* ── LOGIN ── */
+#loginScreen {
+  position: fixed; inset: 0;
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.login-box {
+  border: 1px solid var(--border);
+  padding: 48px 40px;
+  width: 360px;
+  text-align: center;
+}
+.login-box .eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .2em;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.login-box h2 { font-size: 1.6rem; font-weight: 600; margin-bottom: 28px; }
+.login-box input {
+  width: 100%; padding: 10px 14px;
+  background: var(--navy-mid); border: 1px solid var(--border);
+  color: var(--white); font-family: 'DM Mono', monospace; font-size: 13px;
+  outline: none; margin-bottom: 14px;
+}
+.login-box input:focus { border-color: var(--gold); }
+.btn-gold {
+  width: 100%; padding: 11px;
+  background: transparent; border: 1px solid var(--gold);
+  color: var(--gold); font-family: 'EB Garamond', serif; font-size: 1rem;
+  cursor: pointer; letter-spacing: .05em; transition: all .2s;
+}
+.btn-gold:hover { background: var(--gold); color: var(--navy); }
+.login-error { color: var(--red); font-size: .85rem; margin-top: 10px; display: none; }
+
+/* ── LAYOUT ── */
+#app { display: none; }
+.topbar {
+  border-bottom: 1px solid var(--border);
+  padding: 18px 28px;
+  display: flex; align-items: center; gap: 20px;
+  position: sticky; top: 0; z-index: 10;
+  background: var(--navy);
+}
+.topbar-brand .ey {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .2em; color: var(--gold); text-transform: uppercase;
+}
+.topbar-brand h1 { font-size: 1.2rem; font-weight: 600; line-height: 1; }
+.topbar-brand h1 span { color: var(--gold); }
+
+.stats-strip {
+  display: flex; gap: 2px; margin-left: auto;
+}
+.stat-chip {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  padding: 4px 10px; border: 1px solid var(--border);
+  color: var(--muted); letter-spacing: .06em;
+}
+.stat-chip b { color: var(--white); }
+
+.topbar-actions { display: flex; gap: 8px; }
+.btn-sm {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  padding: 6px 14px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  cursor: pointer; letter-spacing: .08em; text-transform: uppercase;
+  transition: all .15s; white-space: nowrap;
+}
+.btn-sm:hover { border-color: var(--gold); color: var(--gold); }
+.btn-sm.primary { border-color: var(--gold); color: var(--gold); }
+.btn-sm:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── FILTERS ── */
+.filterbar {
+  padding: 14px 28px;
+  display: flex; gap: 8px; align-items: center;
+  border-bottom: 1px solid rgba(201,168,76,.06);
+  flex-wrap: wrap;
+}
+.filterbar label {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .15em; color: var(--muted); text-transform: uppercase;
+  margin-right: 4px;
+}
+.ftag {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  padding: 5px 12px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  cursor: pointer; transition: all .15s; text-transform: uppercase; letter-spacing: .06em;
+}
+.ftag:hover, .ftag.on { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.05); }
+.search-input {
+  margin-left: auto;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--white); font-family: 'DM Mono', monospace; font-size: 11px;
+  padding: 5px 12px; outline: none; width: 200px;
+}
+.search-input:focus { border-color: var(--gold); }
+.search-input::placeholder { color: var(--muted); }
+
+/* ── GRID ── */
+.main { padding: 20px 28px 60px; }
+.section-head {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .22em; color: var(--gold-dim);
+  text-transform: uppercase; padding: 16px 0 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-head::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--navy-card);
+  padding: 20px;
+  transition: background .15s;
+  animation: fadeUp .3s ease both;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.card:hover { background: #0d2545; }
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(6px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.card-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 8px;
+}
+.card-source {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .15em; color: var(--gold); text-transform: uppercase;
+}
+.card-badge {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  padding: 2px 7px; border: 1px solid currentColor; letter-spacing: .06em;
+  text-transform: uppercase; flex-shrink: 0;
+}
+.badge-video   { color: #c03030; }
+.badge-news    { color: var(--blue); }
+.badge-ok      { color: var(--green); }
+.badge-reject  { color: var(--red); }
+
+.card-title {
+  font-size: 1rem; font-weight: 600; line-height: 1.35; color: var(--white);
+}
+.card-summary {
+  font-size: .88rem; line-height: 1.55; color: var(--muted); font-style: italic;
+}
+.card-meta {
+  font-family: 'DM Mono', monospace; font-size: 9px; color: var(--gold-dim);
+}
+.card-thumb {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover;
+  border: 1px solid var(--border); display: block;
+}
+
+/* ── POST PREVIEW ── */
+.post-preview {
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--gold);
+  background: rgba(0,0,0,.2);
+  padding: 14px;
+  display: none;
+}
+.post-preview.open { display: block; }
+.post-tabs {
+  display: flex; gap: 0; margin-bottom: 10px;
+}
+.post-tab {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  padding: 4px 12px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  cursor: pointer; letter-spacing: .08em; text-transform: uppercase;
+}
+.post-tab.on { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+.post-content {
+  font-size: .88rem; line-height: 1.6; color: var(--white);
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 200px; overflow-y: auto;
+}
+.post-content:focus {
+  outline: 1px solid var(--gold);
+  background: rgba(201,168,76,.03);
+}
+.post-note {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--muted); margin-top: 8px; font-style: italic;
+}
+
+/* ── CARD ACTIONS ── */
+.card-actions {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
+}
+.act {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  padding: 5px 11px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  cursor: pointer; transition: all .15s; letter-spacing: .06em; text-transform: uppercase;
+}
+.act:hover { border-color: var(--gold); color: var(--gold); }
+.act.approve { border-color: var(--green); color: var(--green); }
+.act.approve:hover { background: var(--green); color: #fff; }
+.act.reject  { border-color: var(--red); color: var(--red); }
+.act.reject:hover  { background: var(--red); color: #fff; }
+.act.download-btn.done { border-color: var(--green); color: var(--green); }
+.act:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── STATUS BADGE ON CARD ── */
+.status-ribbon {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  padding: 2px 8px; text-transform: uppercase; letter-spacing: .1em;
+}
+.ribbon-approved { color: var(--green); border: 1px solid rgba(45,122,74,.4); }
+.ribbon-rejected { color: var(--red);   border: 1px solid rgba(176,48,48,.4); }
+.ribbon-pending  { color: var(--muted); border: 1px solid var(--border); }
+
+/* ── EMPTY / LOADING ── */
+.empty {
+  grid-column: 1/-1; padding: 60px 24px;
+  text-align: center; color: var(--muted);
+  font-style: italic; font-size: 1rem;
+}
+.loader-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+  animation: slide 1.2s linear infinite;
+  display: none; z-index: 999;
+}
+.loader-bar.on { display: block; }
+@keyframes slide {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--navy-mid); border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  padding: 12px 20px; font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--white);
+  opacity: 0; transform: translateY(10px);
+  transition: all .25s; pointer-events: none; z-index: 200;
+  max-width: 320px;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+
+@media(max-width:640px){
+  .topbar { flex-wrap: wrap; padding: 14px 16px; }
+  .stats-strip { display: none; }
+  .main { padding: 14px 12px 60px; }
+  .grid { grid-template-columns: 1fr; }
+  .filterbar { padding: 12px 14px; }
+  .search-input { width: 100%; margin-left: 0; margin-top: 6px; }
+}
+</style>
+</head>
+<body>
+
+<div class="loader-bar" id="loaderBar"></div>
+<div id="toast"></div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="eyebrow">Acrópole · Monitor</div>
+    <h2>Radar <span style="color:var(--gold)">Político</span></h2>
+    <input type="password" id="passInput" placeholder="Senha de acesso" autocomplete="current-password">
+    <button class="btn-gold" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="loginErr">Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="ey">Acrópole · Pipeline</div>
+      <h1>Radar <span>Político</span></h1>
+    </div>
+    <div class="stats-strip" id="statsStrip">
+      <div class="stat-chip"><b id="stTotal">—</b> total</div>
+      <div class="stat-chip"><b id="stPending">—</b> pendentes</div>
+      <div class="stat-chip"><b id="stApproved">—</b> aprovados</div>
+      <div class="stat-chip"><b id="stPost">—</b> com post</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-sm primary" id="btnFetch" onclick="triggerFetch()">↺ Buscar</button>
+      <button class="btn-sm" id="btnBatch" onclick="triggerBatch()">✦ Gerar posts</button>
+      <button class="btn-sm" onclick="logout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="filterbar">
+    <label>Status —</label>
+    <button class="ftag on" data-f="status" data-v="">Todos</button>
+    <button class="ftag" data-f="status" data-v="pending">Pendente</button>
+    <button class="ftag" data-f="status" data-v="approved">Aprovado</button>
+    <button class="ftag" data-f="status" data-v="rejected">Rejeitado</button>
+    <label style="margin-left:12px">Tipo —</label>
+    <button class="ftag on" data-f="type" data-v="">Todos</button>
+    <button class="ftag" data-f="type" data-v="news">Notícias</button>
+    <button class="ftag" data-f="type" data-v="video">Vídeos</button>
+    <input class="search-input" id="searchInput" placeholder="Buscar..." oninput="renderItems()">
+  </div>
+
+  <div class="main">
+    <div class="section-head" id="sectionHead">Itens</div>
+    <div class="grid" id="itemGrid">
+      <div class="empty">Clique em <b>↺ Buscar</b> para carregar notícias e vídeos.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let TOKEN = '';
+let items = [];
+let filters = { status: '', type: '' };
+let activeTab = {}; // itemId -> 'x'|'ig'
+
+// ── AUTH ───────────────────────────────────────────────────────────────────────
+function doLogin() {
+  TOKEN = document.getElementById('passInput').value;
+  document.getElementById('loginErr').style.display = 'none';
+  api('/api/stats').then(() => {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadItems();
+    loadStats();
+  }).catch(() => {
+    document.getElementById('loginErr').style.display = 'block';
+    TOKEN = '';
+  });
+}
+document.getElementById('passInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+function logout() { TOKEN=''; location.reload(); }
+
+// ── API ────────────────────────────────────────────────────────────────────────
+async function api(path, opts = {}) {
+  const res = await fetch(path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', 'x-radar-token': TOKEN, ...(opts.headers||{}) }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function loading(on) {
+  document.getElementById('loaderBar').classList.toggle('on', on);
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── LOAD ───────────────────────────────────────────────────────────────────────
+async function loadItems() {
+  loading(true);
+  try {
+    const data = await api('/api/items');
+    items = data.items || [];
+    renderItems();
+  } finally { loading(false); }
+}
+
+async function loadStats() {
+  try {
+    const s = await api('/api/stats');
+    document.getElementById('stTotal').textContent = s.total;
+    document.getElementById('stPending').textContent = s.pending;
+    document.getElementById('stApproved').textContent = s.approved;
+    document.getElementById('stPost').textContent = s.withPost;
+  } catch {}
+}
+
+// ── FILTERS ────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.ftag').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const f = btn.dataset.f;
+    document.querySelectorAll(`.ftag[data-f="${f}"]`).forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    filters[f] = btn.dataset.v;
+    renderItems();
+  });
+});
+
+// ── RENDER ─────────────────────────────────────────────────────────────────────
+function renderItems() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = items;
+  if (filters.status) filtered = filtered.filter(i => i.status === filters.status);
+  if (filters.type)   filtered = filtered.filter(i => i.type === filters.type);
+  if (q) filtered = filtered.filter(i => i.title.toLowerCase().includes(q) || i.source.toLowerCase().includes(q));
+
+  const grid = document.getElementById('itemGrid');
+  document.getElementById('sectionHead').textContent = `${filtered.length} itens`;
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty">Nenhum item encontrado.</div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  filtered.forEach((item, idx) => {
+    const card = buildCard(item, idx);
+    grid.appendChild(card);
+  });
+}
+
+function buildCard(item, idx) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.style.animationDelay = (idx * 30) + 'ms';
+
+  const statusBadge = {
+    pending:  '<span class="status-ribbon ribbon-pending">Pendente</span>',
+    approved: '<span class="status-ribbon ribbon-approved">✓ Aprovado</span>',
+    rejected: '<span class="status-ribbon ribbon-rejected">✕ Rejeitado</span>',
+  }[item.status] || '';
+
+  const typeBadge = item.type === 'video'
+    ? '<span class="card-badge badge-video">Vídeo</span>'
+    : '<span class="card-badge badge-news">Notícia</span>';
+
+  const thumb = item.thumbnail
+    ? `<img class="card-thumb" src="${item.thumbnail}" alt="" loading="lazy" onerror="this.style.display='none'">`
+    : '';
+
+  const postSection = item.generatedPost ? buildPostPreview(item) : '';
+
+  const dlLabel = item.downloadedFile ? '✓ Baixado' : '↓ Baixar vídeo';
+  const dlClass = item.downloadedFile ? 'act download-btn done' : 'act download-btn';
+
+  div.innerHTML = `
+    <div class="card-top">
+      <span class="card-source">${item.source}</span>
+      <div style="display:flex;gap:6px;align-items:center">${statusBadge}${typeBadge}</div>
+    </div>
+    ${thumb}
+    <div class="card-title">${item.title}</div>
+    ${item.summary ? `<div class="card-summary">${item.summary.slice(0,200)}${item.summary.length>200?'…':''}</div>` : ''}
+    <div class="card-meta">${formatDate(item.publishedAt)} · ${item.source}</div>
+    ${postSection}
+    <div class="card-actions">
+      <button class="act" onclick="genPost('${item.id}', this)">✦ ${item.generatedPost ? 'Regerar post' : 'Gerar post'}</button>
+      ${item.type==='video' ? `<button class="${dlClass}" onclick="dlVideo('${item.id}', this)">${dlLabel}</button>` : ''}
+      ${item.url ? `<a class="act" href="${item.url}" target="_blank" rel="noopener">↗ Abrir</a>` : ''}
+      <button class="act approve" onclick="setStatus('${item.id}','approved')">✓ Aprovar</button>
+      <button class="act reject"  onclick="setStatus('${item.id}','rejected')">✕ Rejeitar</button>
+    </div>
+  `;
+  return div;
+}
+
+function buildPostPreview(item) {
+  const p = item.generatedPost;
+  const tab = activeTab[item.id] || 'x';
+  const xActive = tab==='x' ? 'on' : '';
+  const igActive = tab==='ig' ? 'on' : '';
+  const content = tab==='x' ? p.x?.text : p.instagram?.caption;
+  const note = p.editorial_note || '';
+
+  return `
+    <div class="post-preview open" id="pp_${item.id}">
+      <div class="post-tabs">
+        <button class="post-tab ${xActive}" onclick="switchTab('${item.id}','x')">X / Twitter</button>
+        <button class="post-tab ${igActive}" onclick="switchTab('${item.id}','ig')">Instagram</button>
+      </div>
+      <div class="post-content" id="pc_${item.id}" contenteditable="true"
+           onblur="saveEdit('${item.id}')">${content || ''}</div>
+      ${note ? `<div class="post-note">💡 ${note}</div>` : ''}
+    </div>`;
+}
+
+function switchTab(id, tab) {
+  activeTab[id] = tab;
+  const item = items.find(i => i.id === id);
+  if (!item?.generatedPost) return;
+  const p = item.generatedPost;
+  document.getElementById('pc_'+id).textContent = tab==='x' ? p.x?.text : p.instagram?.caption;
+  document.querySelectorAll(`#pp_${id} .post-tab`).forEach((b,i) => b.classList.toggle('on', (i===0&&tab==='x')||(i===1&&tab==='ig')));
+}
+
+function saveEdit(id) {
+  const item = items.find(i => i.id === id);
+  if (!item?.generatedPost) return;
+  const tab = activeTab[id] || 'x';
+  const val = document.getElementById('pc_'+id)?.textContent || '';
+  if (tab === 'x') item.generatedPost.x.text = val;
+  else item.generatedPost.instagram.caption = val;
+  api(`/api/items/${id}`, { method:'PATCH', body: JSON.stringify({ generatedPost: item.generatedPost }) }).catch(()=>{});
+}
+
+// ── ACTIONS ────────────────────────────────────────────────────────────────────
+async function genPost(id, btn) {
+  btn.disabled = true; btn.textContent = '…gerando';
+  loading(true);
+  try {
+    const data = await api(`/api/generate/${id}`, { method: 'POST' });
+    const item = items.find(i => i.id === id);
+    if (item) item.generatedPost = data.post;
+    renderItems();
+    toast('Post gerado com sucesso');
+  } catch(e) {
+    toast('Erro ao gerar: ' + e.message);
+  } finally {
+    loading(false);
+  }
+}
+
+async function dlVideo(id, btn) {
+  if (btn.classList.contains('done')) return;
+  btn.disabled = true; btn.textContent = '…baixando';
+  loading(true);
+  try {
+    await api(`/api/download/${id}`, { method: 'POST' });
+    toast('Download iniciado — atualize em alguns instantes');
+    setTimeout(() => { loadItems(); loadStats(); }, 8000);
+  } catch(e) {
+    toast('Erro: ' + e.message);
+    btn.disabled = false; btn.textContent = '↓ Baixar vídeo';
+  } finally { loading(false); }
+}
+
+async function setStatus(id, status) {
+  try {
+    await api(`/api/items/${id}`, { method:'PATCH', body: JSON.stringify({ status }) });
+    const item = items.find(i => i.id === id);
+    if (item) item.status = status;
+    renderItems();
+    loadStats();
+    toast(status === 'approved' ? '✓ Aprovado' : '✕ Rejeitado');
+  } catch(e) { toast('Erro: ' + e.message); }
+}
+
+async function triggerFetch() {
+  const btn = document.getElementById('btnFetch');
+  btn.disabled = true; btn.textContent = '…buscando';
+  loading(true);
+  try {
+    await api('/api/fetch', { method: 'POST' });
+    toast('Busca iniciada — aguarde alguns segundos');
+    setTimeout(() => { loadItems(); loadStats(); }, 6000);
+  } catch(e) {
+    toast('Erro: ' + e.message);
+  } finally {
+    loading(false);
+    setTimeout(() => { btn.disabled=false; btn.textContent='↺ Buscar'; }, 7000);
+  }
+}
+
+async function triggerBatch() {
+  const btn = document.getElementById('btnBatch');
+  btn.disabled = true; btn.textContent = '…gerando';
+  loading(true);
+  try {
+    const r = await api('/api/generate-batch', { method: 'POST' });
+    toast(r.message);
+    setTimeout(() => { loadItems(); loadStats(); }, 15000);
+  } catch(e) {
+    toast('Erro: ' + e.message);
+  } finally {
+    loading(false);
+    setTimeout(() => { btn.disabled=false; btn.textContent='✦ Gerar posts'; }, 16000);
+  }
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('pt-BR', { timeZone:'America/Sao_Paulo', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+// Refresh stats every 30s
+setInterval(loadStats, 30000);
+</script>
+</body>
+</html>

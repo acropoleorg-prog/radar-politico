@@ -1,0 +1,6 @@
+node_modules/
+.env
+downloads/
+data/items.json
+*.mp4
+*.log
