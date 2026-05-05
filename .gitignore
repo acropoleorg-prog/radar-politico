@@ -4,3 +4,4 @@ downloads/
 data/items.json
 *.mp4
 *.log
+.claude/
