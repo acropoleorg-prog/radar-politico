@@ -18,28 +18,24 @@ async function generatePost(item) {
   const toneGuide = TONE_INSTRUCTIONS[TONE] || TONE_INSTRUCTIONS.informativo;
 
   const prompt = `Você é editor de redes sociais do portal ${BRAND_NAME}, especializado em política brasileira.
+Tom: ${toneGuide}
 
-Tom editorial: ${toneGuide}
+Notícia:
+Título: ${item.title}
+Fonte: ${item.source}
+Resumo: ${item.summary || '(sem resumo disponível)'}
+Tipo: ${item.type === 'video' ? 'Vídeo' : 'Notícia'}
 
-Item para transformar em post:
-- Título: ${item.title}
-- Fonte: ${item.source}
-- Resumo: ${item.summary || '(sem resumo disponível)'}
-- URL: ${item.url}
-- Tipo: ${item.type === 'video' ? 'Vídeo' : 'Notícia'}
-
-Gere posts otimizados para duas plataformas. Responda SOMENTE com JSON válido, sem markdown:
+Gere textos DISTINTOS para cada plataforma. Responda SOMENTE com JSON válido, sem markdown, sem blocos de código:
 
 {
   "x": {
-    "text": "post para X/Twitter, máximo 280 caracteres, inclua hashtags relevantes no final, inclua o handle ${HANDLE_X} se couber",
-    "hashtags": ["lista", "de", "hashtags", "sem", "cerquilha"]
+    "text": "Post para X/Twitter. Máximo 240 caracteres. Apresente o fato principal de forma direta e impactante. Sem emojis no início. No máximo 2 hashtags curtas no final. Não mencione o handle."
   },
   "instagram": {
-    "caption": "legenda para Instagram, pode ser mais longa (até 2200 chars), use quebras de linha, emojis estratégicos, CTAs como 'Link na bio', hashtags no final separadas por linha",
-    "hashtags": ["lista", "de", "hashtags", "sem", "cerquilha"]
+    "caption": "Legenda para Instagram. Entre 100 e 220 palavras. Aborde os 2 ou 3 pontos mais relevantes da notícia em parágrafos curtos e diretos. Mais contextualizado que o Twitter. Use no máximo 2 emojis estratégicos. Termine com uma linha vazia e depois as hashtags separadas por espaço."
   },
-  "editorial_note": "1 frase sobre por que esse conteúdo é relevante agora para o cenário político brasileiro"
+  "editorial_note": "Uma frase sobre a relevância política desta notícia agora."
 }`;
 
   try {
