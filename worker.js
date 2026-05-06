@@ -6,10 +6,13 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
-const parser = new Parser({
-  timeout: 10000,
-  headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RadarPolitico/1.0)' }
-});
+const parser = new Parser();
+
+// Perfis relevantes do X para monitoramento manual
+const X_PROFILES = [
+  'GloboNews', 'CNNBrasil', 'folha', 'g1', 'Poder360',
+  'AgBrasil', 'JovemPanNews', 'BandNewsTV', 'UOLNoticias', 'OAntagonista',
+];
 
 // ─── FONTES RSS ────────────────────────────────────────────────────────────────
 const RSS_SOURCES = [
@@ -52,7 +55,16 @@ function isRelevant(title, description = '') {
 // ─── FETCH RSS ─────────────────────────────────────────────────────────────────
 async function fetchSource(source) {
   try {
-    const feed = await parser.parseURL(source.url);
+    const { data } = await axios.get(source.url, {
+      timeout: 10000,
+      responseEncoding: 'utf8',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; RadarPolitico/1.0)',
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+        'Accept-Charset': 'utf-8',
+      },
+    });
+    const feed = await parser.parseString(data);
     const cutoff = Date.now() - 24 * 60 * 60 * 1000; // últimas 24h
 
     return feed.items
@@ -165,4 +177,4 @@ function checkYtDlp() {
   });
 }
 
-module.exports = { fetchAllSources, downloadVideo, checkYtDlp };
+module.exports = { fetchAllSources, downloadVideo, checkYtDlp, X_PROFILES };

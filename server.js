@@ -7,14 +7,16 @@ const path    = require('path');
 const fs      = require('fs');
 const cron    = require('node-cron');
 
+const { v4: uuidv4 }                          = require('uuid');
 const { fetchAllSources, downloadVideo, checkYtDlp } = require('./worker');
-const { generatePost, generateBatchPosts } = require('./generator');
+const { generatePost, generateBatchPosts }    = require('./generator');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
-const DATA_FILE     = path.join(__dirname, 'data', 'items.json');
-const PASS          = process.env.DASHBOARD_PASSWORD || 'radar2024';
+const DOWNLOADS_DIR  = path.join(__dirname, 'downloads');
+const DATA_FILE      = path.join(__dirname, 'data', 'items.json');
+const XVIDEOS_FILE   = path.join(__dirname, 'data', 'xvideos.json');
+const PASS           = process.env.DASHBOARD_PASSWORD || 'radar2024';
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
 app.use(cors());
@@ -178,6 +180,38 @@ app.get('/api/stats', auth, (req, res) => {
     withPost: items.filter(i => i.generatedPost).length,
     withDownload: items.filter(i => i.downloadedFile).length,
   });
+});
+
+// ─── X VÍDEOS (manual) ───────────────────────────────────────────────────────
+function loadXVideos() {
+  try {
+    if (!fs.existsSync(XVIDEOS_FILE)) return [];
+    return JSON.parse(fs.readFileSync(XVIDEOS_FILE, 'utf8'));
+  } catch { return []; }
+}
+
+function saveXVideos(videos) {
+  fs.mkdirSync(path.dirname(XVIDEOS_FILE), { recursive: true });
+  fs.writeFileSync(XVIDEOS_FILE, JSON.stringify(videos, null, 2));
+}
+
+app.get('/api/xvideos', auth, (req, res) => {
+  res.json({ videos: loadXVideos() });
+});
+
+app.post('/api/xvideos', auth, (req, res) => {
+  const { url, note } = req.body;
+  if (!url) return res.status(400).json({ error: 'URL obrigatória' });
+  const videos = loadXVideos();
+  videos.unshift({ id: uuidv4(), url, note: note || '', addedAt: new Date().toISOString() });
+  saveXVideos(videos);
+  res.json({ ok: true, videos });
+});
+
+app.delete('/api/xvideos/:id', auth, (req, res) => {
+  const videos = loadXVideos().filter(v => v.id !== req.params.id);
+  saveXVideos(videos);
+  res.json({ ok: true });
 });
 
 // ─── AGENDAMENTO ──────────────────────────────────────────────────────────────
