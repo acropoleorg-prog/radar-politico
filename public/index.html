@@ -4,184 +4,178 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Radar Político · Acrópole</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg:      #ffffff;
-  --surface: #f5f5f5;
-  --border:  #e0e0e0;
-  --text:    #111111;
-  --text-2:  #555555;
-  --text-3:  #999999;
-  --black:   #000000;
-  --green:   #15803d;
-  --red:     #b91c1c;
+  --bg:     #f3f0ea;
+  --paper:  #ffffff;
+  --border: #ccc8be;
+  --text:   #1a1916;
+  --text-2: #54514b;
+  --text-3: #9a9690;
+  --green:  #1a5c35;
+  --red:    #a31c1c;
+  --serif:  'Times New Roman', Times, Georgia, serif;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.65;
   min-height: 100vh;
 }
 
-/* ── LOGIN ── */
+/* ── LOGIN ────────────────────────────────────────────────────── */
 #loginScreen {
   position: fixed; inset: 0; background: var(--bg);
   display: flex; align-items: center; justify-content: center; z-index: 100;
 }
-.login-box { border: 1px solid var(--border); padding: 48px 40px; width: 360px; }
+.login-box {
+  background: var(--paper); border: 1px solid var(--border);
+  padding: 52px 44px; width: 380px;
+}
 .login-eyebrow {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  letter-spacing: .18em; color: var(--text-3); text-transform: uppercase; margin-bottom: 16px;
+  font-size: 10px; letter-spacing: .22em; color: var(--text-3);
+  text-transform: uppercase; margin-bottom: 18px;
 }
-.login-box h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 28px; }
+.login-box h2 { font-size: 1.9rem; font-weight: normal; margin-bottom: 28px; }
+.login-rule { border: none; border-top: 1px solid var(--border); margin-bottom: 24px; }
 .login-box input {
-  width: 100%; padding: 10px 12px; margin-bottom: 12px;
+  width: 100%; padding: 11px 13px; margin-bottom: 12px;
   border: 1px solid var(--border); outline: none;
-  font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text);
+  font-family: var(--serif); font-size: 14px; color: var(--text);
+  background: var(--paper);
 }
-.login-box input:focus { border-color: var(--black); }
+.login-box input:focus { border-color: var(--text); }
 .btn-enter {
-  width: 100%; padding: 10px; background: var(--black); color: #fff;
-  border: none; font-size: 13px; font-weight: 500; cursor: pointer;
+  width: 100%; padding: 11px; background: var(--text); color: #fff;
+  border: none; font-family: var(--serif); font-size: 14px;
+  letter-spacing: .06em; cursor: pointer;
 }
-.btn-enter:hover { opacity: .85; }
+.btn-enter:hover { opacity: .84; }
 .login-err { color: var(--red); font-size: 12px; margin-top: 10px; display: none; }
 
-/* ── APP ── */
+/* ── APP ─────────────────────────────────────────────────────── */
 #app { display: none; }
 
-/* ── TOPBAR ── */
+/* ── TOPBAR ──────────────────────────────────────────────────── */
 .topbar {
-  height: 52px; padding: 0 28px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 20px;
-  position: sticky; top: 0; z-index: 10; background: var(--bg);
+  background: var(--paper);
+  border-bottom: 2px solid var(--text);
+  padding: 0 36px;
+  position: sticky; top: 0; z-index: 10;
 }
-.brand { font-size: 15px; font-weight: 600; letter-spacing: -.02em; flex-shrink: 0; }
-.brand span {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  font-weight: 400; color: var(--text-3); letter-spacing: .1em;
-  text-transform: uppercase; margin-left: 10px;
+.topbar-inner {
+  height: 58px; display: flex; align-items: center; gap: 20px;
 }
+.brand { font-size: 17px; font-weight: bold; letter-spacing: .05em; text-transform: uppercase; flex-shrink: 0; }
+.brand-sub { font-weight: normal; font-size: 10px; color: var(--text-3); letter-spacing: .2em; margin-left: 12px; }
 .stats {
-  display: flex; gap: 18px; margin-left: auto;
-  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-3);
+  display: flex; gap: 22px; margin-left: auto;
+  font-size: 12px; color: var(--text-3);
 }
-.stats b { color: var(--text); font-weight: 500; }
-.topbar-btns { display: flex; gap: 6px; }
+.stats b { color: var(--text); font-weight: normal; font-style: italic; }
+.topbar-btns { display: flex; gap: 8px; }
+
 .btn {
-  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-  padding: 6px 14px; border: 1px solid var(--border);
+  font-family: var(--serif); font-size: 12px;
+  padding: 6px 16px; border: 1px solid var(--border);
   background: transparent; color: var(--text-2);
-  cursor: pointer; text-transform: uppercase; letter-spacing: .06em;
+  cursor: pointer; letter-spacing: .04em;
   transition: border-color .12s, color .12s; white-space: nowrap;
 }
-.btn:hover { border-color: var(--black); color: var(--black); }
-.btn.primary { background: var(--black); color: #fff; border-color: var(--black); }
-.btn.primary:hover { opacity: .85; }
-.btn:disabled { opacity: .35; cursor: not-allowed; }
+.btn:hover { border-color: var(--text); color: var(--text); }
+.btn.primary { background: var(--text); color: #fff; border-color: var(--text); }
+.btn.primary:hover { opacity: .82; }
+.btn:disabled { opacity: .3; cursor: not-allowed; }
 
-/* ── FILTERBAR ── */
+/* ── FILTERBAR ───────────────────────────────────────────────── */
 .filterbar {
-  padding: 10px 28px; display: flex; gap: 6px; align-items: center;
-  background: var(--surface); border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  padding: 11px 36px; display: flex; gap: 6px; align-items: center;
+  background: var(--paper); border-bottom: 1px solid var(--border); flex-wrap: wrap;
 }
-.flabel {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  color: var(--text-3); text-transform: uppercase; letter-spacing: .12em; margin-right: 2px;
-}
+.flabel { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: .18em; margin-right: 4px; }
 .ftag {
-  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-  padding: 4px 12px; border: 1px solid var(--border);
-  background: var(--bg); color: var(--text-3);
-  cursor: pointer; text-transform: uppercase; letter-spacing: .05em;
-  transition: all .12s;
+  font-family: var(--serif); font-size: 12px;
+  padding: 4px 14px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-3);
+  cursor: pointer; transition: all .12s;
 }
 .ftag:hover { border-color: var(--text-2); color: var(--text); }
-.ftag.on { border-color: var(--black); background: var(--black); color: #fff; }
+.ftag.on { border-color: var(--text); background: var(--text); color: #fff; }
 .search {
-  margin-left: auto; padding: 5px 12px;
+  margin-left: auto; padding: 5px 13px;
   border: 1px solid var(--border); outline: none;
-  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-  color: var(--text); width: 220px;
+  font-family: var(--serif); font-size: 12px;
+  color: var(--text); width: 220px; background: transparent;
 }
-.search:focus { border-color: var(--black); }
-.search::placeholder { color: var(--text-3); }
+.search:focus { border-color: var(--text); }
+.search::placeholder { color: var(--text-3); font-style: italic; }
 
-/* ── MAIN ── */
-.main { padding: 24px 28px 80px; }
-.count {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  color: var(--text-3); text-transform: uppercase; letter-spacing: .15em; margin-bottom: 14px;
-}
+/* ── MAIN ────────────────────────────────────────────────────── */
+.main { padding: 28px 36px 80px; max-width: 1600px; margin: 0 auto; }
+.count { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: .2em; margin-bottom: 20px; }
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 1px; background: var(--border); border: 1px solid var(--border);
+  gap: 16px;
 }
 .empty {
-  grid-column: 1/-1; padding: 64px 24px;
-  text-align: center; color: var(--text-3); font-size: 13px; background: var(--bg);
+  grid-column: 1/-1; padding: 80px 24px;
+  text-align: center; color: var(--text-3); font-size: 15px; font-style: italic;
 }
 
-/* ── CARD ── */
+/* ── CARD ────────────────────────────────────────────────────── */
 .card {
-  background: var(--bg); padding: 22px 24px;
-  display: flex; flex-direction: column; gap: 10px;
-  animation: fadeIn .2s ease both;
+  background: var(--paper); border: 1px solid var(--border);
+  padding: 22px 24px 18px;
+  display: flex; flex-direction: column; gap: 0;
+  animation: fadeIn .22s ease both;
+  transition: box-shadow .15s;
 }
-@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+.card:hover { box-shadow: 0 3px 14px rgba(0,0,0,.08); }
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px) } to { opacity:1; transform:none } }
 
-.card-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.card-source {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  color: var(--text-3); text-transform: uppercase; letter-spacing: .1em;
+.card-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding-bottom: 11px; border-bottom: 1px solid var(--border); margin-bottom: 13px;
 }
-.badge {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  padding: 2px 8px; border: 1px solid currentColor;
-  text-transform: uppercase; letter-spacing: .05em;
-}
+.card-source { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: .18em; }
+.badge { font-size: 10px; padding: 2px 9px; border: 1px solid currentColor; text-transform: uppercase; letter-spacing: .06em; }
 .badge-approved { color: var(--green); }
 .badge-rejected { color: var(--red); }
 
-.card-title { font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -.01em; }
-.card-summary { font-size: 13px; line-height: 1.65; color: var(--text-2); }
+.card-title { font-size: 16px; font-weight: bold; line-height: 1.42; margin-bottom: 10px; }
+.card-summary { font-size: 13px; line-height: 1.72; color: var(--text-2); margin-bottom: 14px; }
 
 .card-footer {
-  display: flex; align-items: center; gap: 8px;
-  margin-top: 2px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 7px;
+  padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap;
 }
-.card-date {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  color: var(--text-3); margin-right: auto;
-}
+.card-date { font-size: 10px; color: var(--text-3); margin-right: auto; letter-spacing: .03em; }
 .act {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  padding: 5px 12px; border: 1px solid var(--border);
+  font-family: var(--serif); font-size: 11px;
+  padding: 4px 11px; border: 1px solid var(--border);
   background: transparent; color: var(--text-2);
-  cursor: pointer; text-transform: uppercase; letter-spacing: .05em;
+  cursor: pointer; letter-spacing: .04em;
   text-decoration: none; display: inline-block; transition: all .12s;
 }
-.act:hover { border-color: var(--black); color: var(--black); }
+.act:hover { border-color: var(--text); color: var(--text); }
 .act-approve { border-color: var(--green); color: var(--green); }
-.act-approve:hover { background: var(--green); color: #fff; }
+.act-approve:hover { background: var(--green); color: #fff; border-color: var(--green); }
 .act-reject  { border-color: var(--red); color: var(--red); }
-.act-reject:hover  { background: var(--red); color: #fff; }
+.act-reject:hover  { background: var(--red); color: #fff; border-color: var(--red); }
 .act-remove { color: var(--text-3); }
 .act-remove:hover { border-color: var(--red); color: var(--red); }
 
-/* ── LOADER / TOAST ── */
+/* ── LOADER / TOAST ──────────────────────────────────────────── */
 .loader {
   position: fixed; top: 0; left: 0; right: 0; height: 2px;
-  background: var(--black); display: none; z-index: 999;
-  animation: load 1s ease infinite;
+  background: var(--text); display: none; z-index: 999;
+  animation: load 1.2s ease infinite;
 }
 .loader.on { display: block; }
 @keyframes load {
@@ -190,20 +184,20 @@ body {
   100% { clip-path: inset(0 0 0 100%); }
 }
 #toast {
-  position: fixed; bottom: 24px; right: 24px;
-  background: var(--black); color: #fff;
-  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
-  padding: 10px 18px; opacity: 0; transform: translateY(8px);
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--text); color: #fff;
+  font-family: var(--serif); font-size: 13px;
+  padding: 10px 20px; opacity: 0; transform: translateY(8px);
   transition: all .2s; pointer-events: none; z-index: 200; max-width: 300px;
 }
 #toast.show { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 640px) {
-  .topbar { padding: 0 14px; flex-wrap: wrap; height: auto; padding: 10px 14px; }
+  .topbar { padding: 0 16px; }
   .stats { display: none; }
-  .main { padding: 14px 12px 60px; }
-  .grid { grid-template-columns: 1fr; }
-  .filterbar { padding: 10px 12px; }
+  .main { padding: 16px 14px 60px; }
+  .grid { grid-template-columns: 1fr; gap: 12px; }
+  .filterbar { padding: 10px 14px; }
   .search { width: 100%; margin-left: 0; margin-top: 6px; }
 }
 </style>
@@ -218,6 +212,7 @@ body {
   <div class="login-box">
     <div class="login-eyebrow">Acrópole · Monitor</div>
     <h2>Radar Político</h2>
+    <hr class="login-rule">
     <input type="password" id="passInput" placeholder="senha de acesso" autocomplete="current-password">
     <button class="btn-enter" onclick="doLogin()">Entrar</button>
     <div class="login-err" id="loginErr">Senha incorreta.</div>
@@ -228,15 +223,17 @@ body {
 <div id="app">
 
   <div class="topbar">
-    <div class="brand">Radar Político <span>Acrópole</span></div>
-    <div class="stats" id="statsEl">
-      <span><b id="stTotal">—</b> total</span>
-      <span><b id="stPending">—</b> pendentes</span>
-      <span><b id="stApproved">—</b> aprovados</span>
-    </div>
-    <div class="topbar-btns">
-      <button class="btn primary" id="btnFetch" onclick="triggerFetch()">↺ Atualizar</button>
-      <button class="btn" onclick="logout()">Sair</button>
+    <div class="topbar-inner">
+      <div class="brand">Radar Político <span class="brand-sub">Acrópole</span></div>
+      <div class="stats" id="statsEl">
+        <span><b id="stTotal">—</b> total</span>
+        <span><b id="stPending">—</b> pendentes</span>
+        <span><b id="stApproved">—</b> aprovados</span>
+      </div>
+      <div class="topbar-btns">
+        <button class="btn primary" id="btnFetch" onclick="triggerFetch()">↺ Atualizar</button>
+        <button class="btn" onclick="logout()">Sair</button>
+      </div>
     </div>
   </div>
 
@@ -246,7 +243,7 @@ body {
     <button class="ftag" data-v="pending">Pendente</button>
     <button class="ftag" data-v="approved">Aprovado</button>
     <button class="ftag" data-v="rejected">Rejeitado</button>
-    <input class="search" id="searchInput" placeholder="Buscar título..." oninput="renderItems()">
+    <input class="search" id="searchInput" placeholder="Buscar título…" oninput="renderItems()">
   </div>
 
   <div class="main">
@@ -312,8 +309,8 @@ async function loadItems() {
 async function loadStats() {
   try {
     const s = await api('/api/stats');
-    document.getElementById('stTotal').textContent   = s.total;
-    document.getElementById('stPending').textContent = s.pending;
+    document.getElementById('stTotal').textContent    = s.total;
+    document.getElementById('stPending').textContent  = s.pending;
     document.getElementById('stApproved').textContent = s.approved;
   } catch {}
 }
@@ -362,7 +359,7 @@ function buildCard(item) {
     : '';
 
   const summary = item.summary
-    ? `<div class="card-summary">${esc(item.summary.slice(0, 240))}${item.summary.length > 240 ? '…' : ''}</div>`
+    ? `<div class="card-summary">${esc(item.summary.slice(0, 260))}${item.summary.length > 260 ? '…' : ''}</div>`
     : '';
 
   div.innerHTML = `
@@ -375,9 +372,9 @@ function buildCard(item) {
     <div class="card-footer">
       <span class="card-date">${formatDate(item.publishedAt)}</span>
       ${item.url ? `<a class="act" href="${esc(item.url)}" target="_blank" rel="noopener">↗ Abrir</a>` : ''}
-      <button class="act act-approve" onclick="setStatus('${item.id}','approved')">✓</button>
-      <button class="act act-reject"  onclick="setStatus('${item.id}','rejected')">✕</button>
-      <button class="act act-remove"  onclick="removeItem('${item.id}')">rem</button>
+      <button class="act act-approve" onclick="setStatus('${item.id}','approved')">✓ Aprovar</button>
+      <button class="act act-reject"  onclick="setStatus('${item.id}','rejected')">✕ Rejeitar</button>
+      <button class="act act-remove"  onclick="removeItem('${item.id}')">Remover</button>
     </div>
   `;
   return div;
@@ -405,7 +402,7 @@ async function removeItem(id) {
 
 async function triggerFetch() {
   const btn = document.getElementById('btnFetch');
-  btn.disabled = true; btn.textContent = '…buscando';
+  btn.disabled = true; btn.textContent = '… buscando';
   loading(true);
   try {
     await api('/api/fetch', { method: 'POST' });
