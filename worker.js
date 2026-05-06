@@ -8,16 +8,29 @@ const parser = new Parser();
 // ─── FONTES RSS ────────────────────────────────────────────────────────────────
 // dedicated: true = feed exclusivo de política, dispensa filtro por palavra-chave
 const RSS_SOURCES = [
-  { name: 'G1 Política',     url: 'https://g1.globo.com/rss/g1/politica/feed.xml',                  dedicated: true  },
-  { name: 'Folha Poder',     url: 'https://feeds.folha.uol.com.br/poder/rss091.xml',                dedicated: true  },
-  { name: 'Poder360',        url: 'https://www.poder360.com.br/feed/',                              dedicated: true  },
-  { name: 'Agência Brasil',  url: 'https://agenciabrasil.ebc.com.br/rss/politica/feed.xml',          dedicated: true  },
-  { name: 'CNN Brasil',      url: 'https://www.cnnbrasil.com.br/politica/feed/',                    dedicated: true  },
-  { name: 'Metrópoles',      url: 'https://www.metropoles.com/politica/feed',                       dedicated: true  },
-  { name: 'Agência Senado',  url: 'https://www12.senado.leg.br/noticias/rss/ultimas',               dedicated: true  },
-  { name: 'Câmara Notícias', url: 'https://www.camara.leg.br/noticias/rss/',                       dedicated: true  },
-  { name: 'O Globo',         url: 'https://oglobo.globo.com/rss.xml',                              dedicated: false },
-  { name: 'Veja',            url: 'https://veja.abril.com.br/feed/',                                dedicated: false },
+  // ── Grandes portais ────────────────────────────────────────────────────────
+  { name: 'G1 Política',        url: 'https://g1.globo.com/rss/g1/politica/feed.xml',                       dedicated: true  },
+  { name: 'Folha Poder',        url: 'https://feeds.folha.uol.com.br/poder/rss091.xml',                     dedicated: true  },
+  { name: 'Estadão Política',   url: 'https://www.estadao.com.br/politica/feed',                            dedicated: true  },
+  { name: 'UOL Política',       url: 'https://rss.uol.com.br/feed/noticias.xml',                            dedicated: false },
+  { name: 'O Globo',            url: 'https://oglobo.globo.com/rss.xml',                                    dedicated: false },
+  { name: 'Veja',               url: 'https://veja.abril.com.br/feed/',                                     dedicated: false },
+  { name: 'IstoÉ',              url: 'https://istoe.com.br/feed/',                                          dedicated: false },
+  // ── Especializados em política ─────────────────────────────────────────────
+  { name: 'Poder360',           url: 'https://www.poder360.com.br/feed/',                                   dedicated: true  },
+  { name: 'CNN Brasil Política',url: 'https://www.cnnbrasil.com.br/politica/feed/',                         dedicated: true  },
+  { name: 'Metrópoles Política',url: 'https://www.metropoles.com/politica/feed',                            dedicated: true  },
+  { name: 'Congresso em Foco', url: 'https://congressoemfoco.uol.com.br/feed/',                             dedicated: true  },
+  { name: 'O Antagonista',      url: 'https://www.oantagonista.com/feed/',                                  dedicated: true  },
+  { name: 'Carta Capital',      url: 'https://www.cartacapital.com.br/feed/',                               dedicated: false },
+  { name: 'Correio Braziliense',url: 'https://www.correiobraziliense.com.br/politica/index.rss',            dedicated: true  },
+  { name: 'Jovem Pan Política', url: 'https://jovempan.com.br/noticias/politica/feed',                      dedicated: true  },
+  { name: 'The Intercept BR',   url: 'https://theintercept.com/brasil/feed/',                               dedicated: false },
+  { name: 'Gazeta do Povo',     url: 'https://www.gazetadopovo.com.br/ultimas-noticias/feed.xml',           dedicated: false },
+  // ── Fontes institucionais ──────────────────────────────────────────────────
+  { name: 'Agência Brasil',     url: 'https://agenciabrasil.ebc.com.br/rss/politica/feed.xml',              dedicated: true  },
+  { name: 'Agência Senado',     url: 'https://www12.senado.leg.br/noticias/rss/ultimas',                    dedicated: true  },
+  { name: 'Câmara Notícias',    url: 'https://www.camara.leg.br/noticias/rss/',                             dedicated: true  },
 ];
 
 // ─── FILTRO POR PALAVRA-CHAVE (apenas feeds não-dedicados) ────────────────────
@@ -38,13 +51,11 @@ function isRelevant(title, description = '') {
 }
 
 // ─── CORREÇÃO DE ENCODING ──────────────────────────────────────────────────────
-// Corrige o caso mais comum: bytes UTF-8 lidos como Latin-1 (ex: "Ã§" → "ç")
-// Se ainda restar caracteres estranhos, normaliza para o equivalente ASCII mais próximo
 function sanitizeText(str) {
   if (!str) return '';
   let s = str;
 
-  // Detecta double-encoding pela assinatura "Ã" + byte de continuação UTF-8
+  // 1) Tenta corrigir double-encoding (bytes UTF-8 lidos como Latin-1: "Ã§" → "ç")
   if (/Ã[\x80-\xBF]|Â[\x80-\xBF]/.test(s)) {
     try {
       const attempt = Buffer.from(s, 'latin1').toString('utf8');
@@ -52,16 +63,16 @@ function sanitizeText(str) {
     } catch {}
   }
 
-  // Remove caracteres de substituição e limpa espaços
-  s = s.replace(/�/g, '').replace(/\s+/g, ' ').trim();
+  // 2) Remove caracteres de substituição remanescentes
+  s = s.replace(/�/g, '');
 
-  // Fallback: normaliza acentos para equivalente ASCII se ainda houver lixo
-  // (ex: caractere que não é Unicode válido após a correção acima)
-  if (/[^\x00-\x7FÀ-ɏḀ-ỿ]/.test(s)) {
-    s = s.normalize('NFD').replace(/[̀-ͯ]/g, '').normalize('NFC');
-  }
+  // 3) Decompoe acentos e descarta marcas diacriticas: c,ç→c  a,ã,â→a  e,é→e etc.
+  s = s.normalize('NFD').replace(/[̀-ͯ]/g, '');
 
-  return s;
+  // 4) Remove qualquer nao-ASCII restante (sem gerar espacos em branco extras)
+  s = s.replace(/[^\x00-\x7F]/g, '');
+
+  return s.replace(/\s+/g, ' ').trim();
 }
 
 // ─── FETCH RSS ─────────────────────────────────────────────────────────────────
